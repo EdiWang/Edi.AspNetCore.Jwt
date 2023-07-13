@@ -9,13 +9,13 @@
         <PackageTags>JWT</PackageTags>
         <PackageProjectUrl>https://edi.wang</PackageProjectUrl>
         <RepositoryUrl>https://github.com/EdiWang/Edi.AspNetCore.Jwt</RepositoryUrl>
-        <Version>0.5.0-preview</Version>
+        <Version>0.6.0-preview</Version>
         <Description>JWT authentication library for my own</Description>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.18" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.20" />
     </ItemGroup>
 
 </Project>
