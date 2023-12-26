@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Edi.AspNetCore.Jwt", "Edi.A
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApi", "TestApi\TestApi.csproj", "{47F40FE7-26B9-4922-870E-5533CA8D2676}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Edi.AspNetCore.Jwt.Tests", "Edi.AspNetCore.Jwt.Tests\Edi.AspNetCore.Jwt.Tests.csproj", "{419FBC13-E101-483C-AEAA-57AC0F915106}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{47F40FE7-26B9-4922-870E-5533CA8D2676}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{47F40FE7-26B9-4922-870E-5533CA8D2676}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{47F40FE7-26B9-4922-870E-5533CA8D2676}.Release|Any CPU.Build.0 = Release|Any CPU
+		{419FBC13-E101-483C-AEAA-57AC0F915106}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{419FBC13-E101-483C-AEAA-57AC0F915106}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{419FBC13-E101-483C-AEAA-57AC0F915106}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{419FBC13-E101-483C-AEAA-57AC0F915106}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
