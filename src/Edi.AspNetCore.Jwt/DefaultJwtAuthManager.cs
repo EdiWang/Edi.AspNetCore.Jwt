@@ -1,6 +1,4 @@
-﻿using System.Collections.Concurrent;
-using System.Collections.Immutable;
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -11,36 +9,36 @@ namespace Edi.AspNetCore.Jwt;
 public class DefaultJwtAuthManager : IJwtAuthManager
 {
     public JwtTokenConfig JwtTokenConfig { get; }
-    public IImmutableDictionary<string, RefreshToken> UsersRefreshTokensReadOnlyDictionary => _usersRefreshTokens.ToImmutableDictionary();
-    private readonly ConcurrentDictionary<string, RefreshToken> _usersRefreshTokens;
+
+    private readonly IRefreshTokenStore _refreshTokenStore;
     private readonly byte[] _secret;
 
-    public DefaultJwtAuthManager(JwtTokenConfig jwtTokenConfig)
+    public DefaultJwtAuthManager(JwtTokenConfig jwtTokenConfig, IRefreshTokenStore refreshTokenStore)
     {
         JwtTokenConfig = jwtTokenConfig;
-        _usersRefreshTokens = new();
+        _refreshTokenStore = refreshTokenStore;
         _secret = Encoding.ASCII.GetBytes(jwtTokenConfig.Secret);
     }
 
-    public void RemoveExpiredRefreshTokens(DateTime utcNow)
+    public async Task RemoveExpiredRefreshTokens(DateTime utcNow)
     {
-        var expiredTokens = _usersRefreshTokens.Where(x => x.Value.ExpireAt < utcNow).ToList();
+        var expiredTokens = _refreshTokenStore.RefreshTokens.Where(x => x.Value.ExpireAt < utcNow).ToList();
         foreach (var expiredToken in expiredTokens)
         {
-            _usersRefreshTokens.TryRemove(expiredToken.Key, out _);
+            await _refreshTokenStore.Remove(expiredToken.Key);
         }
     }
 
-    public void RemoveRefreshToken(string identifier)
+    public async Task RemoveRefreshToken(string identifier)
     {
-        var refreshTokens = _usersRefreshTokens.Where(x => x.Value.Identifier == identifier).ToList();
+        var refreshTokens = _refreshTokenStore.RefreshTokens.Where(x => x.Value.Identifier == identifier).ToList();
         foreach (var refreshToken in refreshTokens)
         {
-            _usersRefreshTokens.TryRemove(refreshToken.Key, out _);
+            await _refreshTokenStore.Remove(refreshToken.Key);
         }
     }
 
-    public JwtAuthResult GenerateTokens(string identifier, Claim[] claims, DateTime utcNow)
+    public async Task<JwtAuthResult> GenerateTokens(string identifier, Claim[] claims, DateTime utcNow)
     {
         var shouldAddAudienceClaim = string.IsNullOrWhiteSpace(claims?.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Aud)?.Value);
         var jwtToken = new JwtSecurityToken(
@@ -57,7 +55,8 @@ public class DefaultJwtAuthManager : IJwtAuthManager
             TokenString = GenerateRefreshTokenString(),
             ExpireAt = utcNow.AddMinutes(JwtTokenConfig.RefreshTokenExpiration)
         };
-        _usersRefreshTokens.AddOrUpdate(refreshToken.TokenString, refreshToken, (_, _) => refreshToken);
+
+        await _refreshTokenStore.AddOrUpdate(refreshToken.TokenString, refreshToken);
 
         return new()
         {
@@ -66,7 +65,7 @@ public class DefaultJwtAuthManager : IJwtAuthManager
         };
     }
 
-    public RefreshTokenResult Refresh(string refreshToken, string accessToken, string claimName, DateTime utcNow)
+    public async Task<RefreshTokenResult> Refresh(string refreshToken, string accessToken, string claimName, DateTime utcNow)
     {
         ClaimsPrincipal principal = null;
 
@@ -86,7 +85,9 @@ public class DefaultJwtAuthManager : IJwtAuthManager
         }
 
         var identifier = principal.Claims.First(p => p.Type == claimName).Value;
-        if (!_usersRefreshTokens.TryGetValue(refreshToken, out var existingRefreshToken))
+        var existingRefreshToken = await _refreshTokenStore.Get(refreshToken);
+
+        if (null == existingRefreshToken)
         {
             throw new SecurityTokenException("Invalid token");
         }
@@ -95,7 +96,7 @@ public class DefaultJwtAuthManager : IJwtAuthManager
             throw new SecurityTokenException("Invalid token");
         }
 
-        var tokens = GenerateTokens(identifier, principal.Claims.ToArray(), utcNow);
+        var tokens = await GenerateTokens(identifier, principal.Claims.ToArray(), utcNow);
 
         return new()
         {

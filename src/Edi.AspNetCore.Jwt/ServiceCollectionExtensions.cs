@@ -35,6 +35,8 @@ public static class ServiceCollectionExtensions
                 };
             });
 
+        services.AddSingleton<IRefreshTokenStore, InMemoryRefreshTokenStore>();
+
         services.AddSingleton<IJwtAuthManager, T>()
                 .AddHostedService<JwtRefreshTokenCache>();
 
