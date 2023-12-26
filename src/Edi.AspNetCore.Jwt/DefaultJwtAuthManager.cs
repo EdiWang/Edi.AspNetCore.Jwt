@@ -22,7 +22,7 @@ public class DefaultJwtAuthManager : IJwtAuthManager
 
     public async Task RemoveExpiredRefreshTokens(DateTime utcNow)
     {
-        var expiredTokens = _refreshTokenStore.RefreshTokens.Where(x => x.Value.ExpireAt < utcNow).ToList();
+        var expiredTokens = await _refreshTokenStore.GetTokensBefore(utcNow);
         foreach (var expiredToken in expiredTokens)
         {
             await _refreshTokenStore.Remove(expiredToken.Key);
@@ -31,7 +31,7 @@ public class DefaultJwtAuthManager : IJwtAuthManager
 
     public async Task RemoveRefreshToken(string identifier)
     {
-        var refreshTokens = _refreshTokenStore.RefreshTokens.Where(x => x.Value.Identifier == identifier).ToList();
+        var refreshTokens = await _refreshTokenStore.GetTokensByIdentifier(identifier);
         foreach (var refreshToken in refreshTokens)
         {
             await _refreshTokenStore.Remove(refreshToken.Key);
