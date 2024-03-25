@@ -7,15 +7,18 @@ JWT authentication library for my own
 ## Install from NuGet
 
 ```powershell
-dotnet add package Edi.AspNetCore.Jwt
+dotnet add package Edi.AspNetCore.Jwt --version 0.9.4-beta.5
+dotnet add package Edi.AspNetCore.Jwt.InMemory --version 0.9.4-beta.5
 ```
 
 ```powershell
-NuGet\Install-Package Edi.AspNetCore.Jwt
+NuGet\Install-Package Edi.AspNetCore.Jwt --version 0.9.4-beta.5
+NuGet\Install-Package Edi.AspNetCore.Jwt.InMemory --version 0.9.4-beta.5
 ```
 
 ```xml
-<PackageReference Include="Edi.AspNetCore.Jwt" Version="0.5.0-preview" />
+<PackageReference Include="Edi.AspNetCore.Jwt" Version="0.9.5-beta.5" />
+<PackageReference Include="Edi.AspNetCore.Jwt.InMemory" Version="0.9.5-beta.5" />
 ```
 
 ## Usage
@@ -25,16 +28,17 @@ NuGet\Install-Package Edi.AspNetCore.Jwt
 #### `Program.cs`
 
 ```csharp
-builder.Services.AddJwtAuth<DefaultJwtAuthManager>(builder.Configuration);
+builder.Services.AddJwtAuth<DefaultJwtAuthManager>(builder.Configuration)
+                .AddInMemoryRefreshTokenStore();
 ```
 
 #### `appsettings.json`
 
 ```json
 "JWTConfig": {
-  "Secret": "",
-  "Issuer": "",
-  "Audience": "",
+  "Secret": "b9e942ac-dd01-4523-9e0e-21f4f642fe74",
+  "Issuer": "edi.wang",
+  "Audience": "edi",
   "AccessTokenExpiration": 20,
   "RefreshTokenExpiration": 480
 }
