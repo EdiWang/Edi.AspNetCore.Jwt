@@ -9,12 +9,12 @@ namespace Edi.AspNetCore.Jwt;
 public class JwtAuthServiceCollectionBuilder
 {
     public IServiceCollection Services { get; set; }
+    public IConfiguration Configuration { get; set; }
 
-    public JwtAuthServiceCollectionBuilder(IServiceCollection services) => Services = services;
-
-    public IServiceCollection AddRefreshTokenStore<TImplementation>() where TImplementation : class, IRefreshTokenStore
+    public JwtAuthServiceCollectionBuilder(IServiceCollection services, IConfiguration configuration)
     {
-        return Services.AddSingleton<IRefreshTokenStore, TImplementation>();
+        Services = services;
+        Configuration = configuration;
     }
 }
 
@@ -50,6 +50,6 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IJwtAuthManager, T>()
                 .AddHostedService<JwtRefreshTokenCache>();
 
-        return new(services);
+        return new(services, configuration);
     }
 }
