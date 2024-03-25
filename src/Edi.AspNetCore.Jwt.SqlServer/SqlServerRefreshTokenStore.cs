@@ -46,4 +46,21 @@ public class SqlServerRefreshTokenStore : IRefreshTokenStore, IDisposable
     {
         _connection?.Dispose();
     }
+
+    private void EnsureRefreshTokenTableCreated()
+    {
+        using var command = _connection.CreateCommand();
+        command.CommandText = @"
+            IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = 'RefreshTokens')
+            BEGIN
+                CREATE TABLE RefreshTokens
+                (
+                    Id UNIQUEIDENTIFIER PRIMARY KEY NOT NULL,
+                    Identifier NVARCHAR(450) NOT NULL,
+                    TokenString NVARCHAR(MAX) PRIMARY KEY NOT NULL,
+                    ExpireAt DATETIME NOT NULL
+                )
+            END";
+        command.ExecuteNonQuery();
+    }
 }
