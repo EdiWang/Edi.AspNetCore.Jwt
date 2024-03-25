@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFrameworks>net6.0;net8.0</TargetFrameworks>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Authors>Edi Wang</Authors>
+        <Company>edi.wang</Company>
+        <PackageTags>JWT</PackageTags>
+        <PackageProjectUrl>https://edi.wang</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/EdiWang/Edi.AspNetCore.Jwt</RepositoryUrl>
+        <Version>0.9.6-beta.6</Version>
+        <Description>SQL Server storage provider for Edi.AspNetCore.Jwt</Description>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageIcon>edi-logo-blue.png</PackageIcon>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+        <None Include="..\..\img\edi-logo-blue.png" Pack="true" PackagePath="\" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Edi.AspNetCore.Jwt" Version="0.9.6-beta.6" />
+    </ItemGroup>
+</Project>
