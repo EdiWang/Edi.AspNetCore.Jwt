@@ -22,5 +22,6 @@
 
     <ItemGroup>
         <PackageReference Include="Edi.AspNetCore.Jwt" Version="0.9.7-beta.7" />
+        <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.0" />
     </ItemGroup>
 </Project>
