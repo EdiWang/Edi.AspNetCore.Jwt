@@ -1,3 +1,4 @@
+using Edi.AspNetCore.Jwt.InMemory;
 using NUnit.Framework;
 
 namespace Edi.AspNetCore.Jwt.Tests;

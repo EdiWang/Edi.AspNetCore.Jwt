@@ -6,9 +6,21 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Edi.AspNetCore.Jwt;
 
+public class JwtAuthServiceCollectionBuilder
+{
+    public IServiceCollection Services { get; set; }
+
+    public JwtAuthServiceCollectionBuilder(IServiceCollection services) => Services = services;
+
+    public IServiceCollection AddRefreshTokenStore<TImplementation>() where TImplementation : class, IRefreshTokenStore
+    {
+        return Services.AddSingleton<IRefreshTokenStore, TImplementation>();
+    }
+}
+
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddJwtAuth<T>(this IServiceCollection services, IConfiguration configuration) where T : class, IJwtAuthManager
+    public static JwtAuthServiceCollectionBuilder AddJwtAuth<T>(this IServiceCollection services, IConfiguration configuration) where T : class, IJwtAuthManager
     {
         var jwtTokenConfig = configuration.GetSection("JWTConfig").Get<JwtTokenConfig>();
 
@@ -35,11 +47,9 @@ public static class ServiceCollectionExtensions
                 };
             });
 
-        services.AddSingleton<IRefreshTokenStore, InMemoryRefreshTokenStore>();
-
         services.AddSingleton<IJwtAuthManager, T>()
                 .AddHostedService<JwtRefreshTokenCache>();
 
-        return services;
+        return new(services);
     }
 }
