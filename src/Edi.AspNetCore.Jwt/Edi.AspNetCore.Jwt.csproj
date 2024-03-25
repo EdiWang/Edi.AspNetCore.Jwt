@@ -8,7 +8,7 @@
         <PackageTags>JWT</PackageTags>
         <PackageProjectUrl>https://edi.wang</PackageProjectUrl>
         <RepositoryUrl>https://github.com/EdiWang/Edi.AspNetCore.Jwt</RepositoryUrl>
-        <Version>0.9.6-beta.6</Version>
+        <Version>0.9.7-beta.7</Version>
         <Description>JWT authentication library for my own</Description>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageIcon>edi-logo-blue.png</PackageIcon>
