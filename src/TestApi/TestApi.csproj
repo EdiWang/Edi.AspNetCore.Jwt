@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Edi.AspNetCore.Jwt.InMemory\Edi.AspNetCore.Jwt.InMemory.csproj" />
-    <ProjectReference Include="..\Edi.AspNetCore.Jwt\Edi.AspNetCore.Jwt.csproj" />
   </ItemGroup>
 
 </Project>

@@ -9,7 +9,7 @@
         <PackageTags>JWT</PackageTags>
         <PackageProjectUrl>https://edi.wang</PackageProjectUrl>
         <RepositoryUrl>https://github.com/EdiWang/Edi.AspNetCore.Jwt</RepositoryUrl>
-        <Version>0.9.5-beta.5</Version>
+        <Version>0.9.6-beta.6</Version>
         <Description>In memory storage provider for Edi.AspNetCore.Jwt</Description>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageIcon>edi-logo-blue.png</PackageIcon>
@@ -17,11 +17,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Edi.AspNetCore.Jwt\Edi.AspNetCore.Jwt.csproj" />
+        <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+        <None Include="..\..\img\edi-logo-blue.png" Pack="true" PackagePath="\" />
     </ItemGroup>
 
     <ItemGroup>
-        <None Include="..\..\README.md" Pack="true" PackagePath="\"/>
-        <None Include="..\..\img\edi-logo-blue.png" Pack="true" PackagePath="\"/>
+      <PackageReference Include="Edi.AspNetCore.Jwt" Version="0.9.6-beta.6" />
     </ItemGroup>
 </Project>
