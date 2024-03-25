@@ -38,7 +38,7 @@ public class DefaultJwtAuthManager : IJwtAuthManager
         }
     }
 
-    public async Task<JwtAuthResult> GenerateTokens(string identifier, Claim[] claims, DateTime utcNow)
+    public async Task<JwtAuthResult> GenerateTokens(string userIdentifier, Claim[] claims, DateTime utcNow)
     {
         var shouldAddAudienceClaim = string.IsNullOrWhiteSpace(claims?.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Aud)?.Value);
         var jwtToken = new JwtSecurityToken(
@@ -51,7 +51,7 @@ public class DefaultJwtAuthManager : IJwtAuthManager
 
         var refreshToken = new RefreshToken
         {
-            Identifier = identifier,
+            UserIdentifier = userIdentifier,
             TokenString = GenerateRefreshTokenString(),
             ExpireAt = utcNow.AddMinutes(JwtTokenConfig.RefreshTokenExpiration)
         };
@@ -91,7 +91,8 @@ public class DefaultJwtAuthManager : IJwtAuthManager
         {
             throw new SecurityTokenException("Invalid token");
         }
-        if (existingRefreshToken.Identifier != identifier || existingRefreshToken.ExpireAt < utcNow)
+
+        if (existingRefreshToken.UserIdentifier != identifier || existingRefreshToken.ExpireAt < utcNow)
         {
             throw new SecurityTokenException("Invalid token");
         }
