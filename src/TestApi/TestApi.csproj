@@ -3,11 +3,11 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <InvariantGlobalization>true</InvariantGlobalization>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Edi.AspNetCore.Jwt.InMemory\Edi.AspNetCore.Jwt.InMemory.csproj" />
+    <ProjectReference Include="..\Edi.AspNetCore.Jwt.SqlServer\Edi.AspNetCore.Jwt.SqlServer.csproj" />
   </ItemGroup>
 
 </Project>

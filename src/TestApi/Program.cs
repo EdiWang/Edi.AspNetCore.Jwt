@@ -1,10 +1,13 @@
 using Edi.AspNetCore.Jwt;
-using Edi.AspNetCore.Jwt.InMemory;
+//using Edi.AspNetCore.Jwt.InMemory;
+using Edi.AspNetCore.Jwt.SqlServer;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
-builder.Services.AddJwtAuth<DefaultJwtAuthManager>(builder.Configuration).AddInMemoryRefreshTokenStore();
+builder.Services.AddJwtAuth<DefaultJwtAuthManager>(builder.Configuration)
+                .AddSqlServerRefreshTokenStore("DefaultConnection");
+//.AddInMemoryRefreshTokenStore();
 
 var app = builder.Build();
 
