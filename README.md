@@ -7,18 +7,13 @@ JWT authentication library for my own
 ## Install from NuGet
 
 ```powershell
-dotnet add package Edi.AspNetCore.Jwt --version 0.9.7-beta.7
-dotnet add package Edi.AspNetCore.Jwt.InMemory --version 0.9.7-beta.7
+dotnet add package Edi.AspNetCore.Jwt.InMemory --version 0.10.0-beta.8
 ```
+
+or
 
 ```powershell
-NuGet\Install-Package Edi.AspNetCore.Jwt --version 0.9.7-beta.7
-NuGet\Install-Package Edi.AspNetCore.Jwt.InMemory --version 0.9.7-beta.7
-```
-
-```xml
-<PackageReference Include="Edi.AspNetCore.Jwt" Version="0.9.7-beta.7" />
-<PackageReference Include="Edi.AspNetCore.Jwt.InMemory" Version="0.9.7-beta.7" />
+dotnet add package Edi.AspNetCore.Jwt.SqlServer --version 0.10.0-beta.8
 ```
 
 ## Usage
@@ -29,7 +24,8 @@ NuGet\Install-Package Edi.AspNetCore.Jwt.InMemory --version 0.9.7-beta.7
 
 ```csharp
 builder.Services.AddJwtAuth<DefaultJwtAuthManager>(builder.Configuration)
-                .AddInMemoryRefreshTokenStore();
+                .AddInMemoryRefreshTokenStore(); 
+                // or .AddSqlServerRefreshTokenStore("DefaultConnection");
 ```
 
 #### `appsettings.json`
@@ -41,6 +37,14 @@ builder.Services.AddJwtAuth<DefaultJwtAuthManager>(builder.Configuration)
   "Audience": "edi",
   "AccessTokenExpiration": 20,
   "RefreshTokenExpiration": 480
+}
+```
+
+or with
+
+```json
+"ConnectionStrings": {
+    "DefaultConnection": "Server=(localdb)\\MSSQLLocalDB;Database=work996;Trusted_Connection=True;"
 }
 ```
 
