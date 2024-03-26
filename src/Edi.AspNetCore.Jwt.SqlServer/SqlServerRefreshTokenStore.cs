@@ -9,6 +9,7 @@ public class SqlServerRefreshTokenStore(string connectionString) : IRefreshToken
 
     public async Task AddOrUpdate(string key, RefreshToken token)
     {
+        await OpenConnectionAsync();
         EnsureRefreshTokenTableCreated();
 
         await using var command = _connection.CreateCommand();
@@ -32,6 +33,7 @@ public class SqlServerRefreshTokenStore(string connectionString) : IRefreshToken
 
     public async Task<RefreshToken> Get(string key)
     {
+        await OpenConnectionAsync();
         EnsureRefreshTokenTableCreated();
 
         await using var command = _connection.CreateCommand();
@@ -54,6 +56,7 @@ public class SqlServerRefreshTokenStore(string connectionString) : IRefreshToken
 
     public async Task<List<KeyValuePair<string, RefreshToken>>> GetTokensBefore(DateTime time)
     {
+        await OpenConnectionAsync();
         EnsureRefreshTokenTableCreated();
 
         var tokens = new List<KeyValuePair<string, RefreshToken>>();
@@ -81,6 +84,7 @@ public class SqlServerRefreshTokenStore(string connectionString) : IRefreshToken
 
     public async Task<List<KeyValuePair<string, RefreshToken>>> GetTokensByIdentifier(string userIdentifier)
     {
+        await OpenConnectionAsync();
         EnsureRefreshTokenTableCreated();
 
         var tokens = new List<KeyValuePair<string, RefreshToken>>();
@@ -108,6 +112,7 @@ public class SqlServerRefreshTokenStore(string connectionString) : IRefreshToken
 
     public async Task Remove(string key)
     {
+        await OpenConnectionAsync();
         EnsureRefreshTokenTableCreated();
 
         await using var command = _connection.CreateCommand();
@@ -119,6 +124,7 @@ public class SqlServerRefreshTokenStore(string connectionString) : IRefreshToken
 
     public void Dispose()
     {
+        _connection?.Close();
         _connection?.Dispose();
     }
 
@@ -137,6 +143,14 @@ public class SqlServerRefreshTokenStore(string connectionString) : IRefreshToken
                 )
             END";
         command.ExecuteNonQuery();
+    }
+
+    private async Task OpenConnectionAsync()
+    {
+        if (_connection.State != ConnectionState.Open)
+        {
+            await _connection.OpenAsync();
+        }
     }
 }
 
