@@ -4,18 +4,9 @@ using System.Data;
 
 namespace Edi.AspNetCore.Jwt.SqlServer;
 
-public class SqlServerRefreshTokenStore : IRefreshTokenStore, IDisposable
+public class SqlServerRefreshTokenStore(string connectionString) : IRefreshTokenStore, IDisposable
 {
-    private readonly string _connectionString;
-    private readonly IDbConnection _connection;
-
-    public SqlServerRefreshTokenStore(string connectionString)
-    {
-        _connectionString = connectionString;
-        _connection = new SqlConnection(_connectionString);
-    }
-
-    public ConcurrentDictionary<string, RefreshToken> RefreshTokens { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    private readonly IDbConnection _connection = new SqlConnection(connectionString);
 
     public Task AddOrUpdate(string key, RefreshToken token)
     {
