@@ -6,16 +6,10 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Edi.AspNetCore.Jwt;
 
-public class JwtAuthServiceCollectionBuilder
+public class JwtAuthServiceCollectionBuilder(IServiceCollection services, IConfiguration configuration)
 {
-    public IServiceCollection Services { get; set; }
-    public IConfiguration Configuration { get; set; }
-
-    public JwtAuthServiceCollectionBuilder(IServiceCollection services, IConfiguration configuration)
-    {
-        Services = services;
-        Configuration = configuration;
-    }
+    public IServiceCollection Services { get; set; } = services;
+    public IConfiguration Configuration { get; set; } = configuration;
 }
 
 public static class ServiceCollectionExtensions
