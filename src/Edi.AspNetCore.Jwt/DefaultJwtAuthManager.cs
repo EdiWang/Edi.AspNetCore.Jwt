@@ -6,39 +6,32 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Edi.AspNetCore.Jwt;
 
-public class DefaultJwtAuthManager : IJwtAuthManager
+public class DefaultJwtAuthManager(JwtTokenConfig jwtTokenConfig, IRefreshTokenStore refreshTokenStore)
+    : IJwtAuthManager
 {
-    public JwtTokenConfig JwtTokenConfig { get; }
+    public JwtTokenConfig JwtTokenConfig { get; } = jwtTokenConfig;
 
-    private readonly IRefreshTokenStore _refreshTokenStore;
-    private readonly byte[] _secret;
-
-    public DefaultJwtAuthManager(JwtTokenConfig jwtTokenConfig, IRefreshTokenStore refreshTokenStore)
-    {
-        JwtTokenConfig = jwtTokenConfig;
-        _refreshTokenStore = refreshTokenStore;
-        _secret = Encoding.ASCII.GetBytes(jwtTokenConfig.Secret);
-    }
+    private readonly byte[] _secret = Encoding.ASCII.GetBytes(jwtTokenConfig.Secret);
 
     public async Task RemoveExpiredRefreshTokens(DateTime utcNow)
     {
-        var expiredTokens = await _refreshTokenStore.GetTokensBefore(utcNow);
+        var expiredTokens = await refreshTokenStore.GetTokensBefore(utcNow);
         foreach (var expiredToken in expiredTokens)
         {
-            await _refreshTokenStore.Remove(expiredToken.Key);
+            await refreshTokenStore.Remove(expiredToken.Key);
         }
     }
 
     public async Task RemoveRefreshToken(string identifier)
     {
-        var refreshTokens = await _refreshTokenStore.GetTokensByIdentifier(identifier);
+        var refreshTokens = await refreshTokenStore.GetTokensByIdentifier(identifier);
         foreach (var refreshToken in refreshTokens)
         {
-            await _refreshTokenStore.Remove(refreshToken.Key);
+            await refreshTokenStore.Remove(refreshToken.Key);
         }
     }
 
-    public async Task<JwtAuthResult> GenerateTokens(string identifier, Claim[] claims, DateTime utcNow)
+    public async Task<JwtAuthResult> GenerateTokens(string userIdentifier, Claim[] claims, DateTime utcNow)
     {
         var shouldAddAudienceClaim = string.IsNullOrWhiteSpace(claims?.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Aud)?.Value);
         var jwtToken = new JwtSecurityToken(
@@ -51,12 +44,12 @@ public class DefaultJwtAuthManager : IJwtAuthManager
 
         var refreshToken = new RefreshToken
         {
-            Identifier = identifier,
+            UserIdentifier = userIdentifier,
             TokenString = GenerateRefreshTokenString(),
             ExpireAt = utcNow.AddMinutes(JwtTokenConfig.RefreshTokenExpiration)
         };
 
-        await _refreshTokenStore.AddOrUpdate(refreshToken.TokenString, refreshToken);
+        await refreshTokenStore.AddOrUpdate(refreshToken.TokenString, refreshToken);
 
         return new()
         {
@@ -85,13 +78,14 @@ public class DefaultJwtAuthManager : IJwtAuthManager
         }
 
         var identifier = principal.Claims.First(p => p.Type == claimName).Value;
-        var existingRefreshToken = await _refreshTokenStore.Get(refreshToken);
+        var existingRefreshToken = await refreshTokenStore.Get(refreshToken);
 
         if (null == existingRefreshToken)
         {
             throw new SecurityTokenException("Invalid token");
         }
-        if (existingRefreshToken.Identifier != identifier || existingRefreshToken.ExpireAt < utcNow)
+
+        if (existingRefreshToken.UserIdentifier != identifier || existingRefreshToken.ExpireAt < utcNow)
         {
             throw new SecurityTokenException("Invalid token");
         }
