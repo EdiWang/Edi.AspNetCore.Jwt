@@ -1,5 +1,4 @@
 ﻿using Microsoft.Data.SqlClient;
-using System.Collections.Concurrent;
 using System.Data;
 
 namespace Edi.AspNetCore.Jwt.SqlServer;
@@ -46,9 +45,9 @@ public class SqlServerRefreshTokenStore(string connectionString) : IRefreshToken
             BEGIN
                 CREATE TABLE RefreshTokens
                 (
-                    Id UNIQUEIDENTIFIER PRIMARY KEY NOT NULL,
+                    Id VARCHAR(64) PRIMARY KEY NOT NULL,
                     Identifier NVARCHAR(450) NOT NULL,
-                    TokenString NVARCHAR(MAX) PRIMARY KEY NOT NULL,
+                    TokenString NVARCHAR(MAX) NOT NULL,
                     ExpireAt DATETIME NOT NULL
                 )
             END";
