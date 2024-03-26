@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net6.0;net8.0</TargetFrameworks>
+        <TargetFramework>net8.0</TargetFramework>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <ImplicitUsings>enable</ImplicitUsings>
         <Authors>Edi Wang</Authors>
@@ -9,7 +9,7 @@
         <PackageTags>JWT</PackageTags>
         <PackageProjectUrl>https://edi.wang</PackageProjectUrl>
         <RepositoryUrl>https://github.com/EdiWang/Edi.AspNetCore.Jwt</RepositoryUrl>
-        <Version>0.9.7-beta.7</Version>
+        <Version>0.10.0-beta.8</Version>
         <Description>In memory storage provider for Edi.AspNetCore.Jwt</Description>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageIcon>edi-logo-blue.png</PackageIcon>
@@ -22,6 +22,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Edi.AspNetCore.Jwt" Version="0.9.7-beta.7" />
+      <PackageReference Include="Edi.AspNetCore.Jwt" Version="0.10.0-beta.8" />
     </ItemGroup>
 </Project>

@@ -3,22 +3,15 @@ using Microsoft.Extensions.Logging;
 
 namespace Edi.AspNetCore.Jwt.InMemory;
 
-public class InMemoryRefreshTokenStore : IRefreshTokenStore
+public class InMemoryRefreshTokenStore(ILogger<InMemoryRefreshTokenStore> logger) : IRefreshTokenStore
 {
-    private readonly ILogger<InMemoryRefreshTokenStore> _logger;
-
-    public InMemoryRefreshTokenStore(ILogger<InMemoryRefreshTokenStore> logger)
-    {
-        _logger = logger;
-    }
-
     public ConcurrentDictionary<string, RefreshToken> RefreshTokens { get; set; } = new();
 
     public Task AddOrUpdate(string key, RefreshToken token)
     {
         RefreshTokens.AddOrUpdate(key, token, (_, _) => token);
 
-        _logger.LogDebug($"Refresh token added or updated for key: {key}");
+        logger.LogDebug($"Refresh token added or updated for key: {key}");
         return Task.CompletedTask;
     }
 
@@ -26,7 +19,7 @@ public class InMemoryRefreshTokenStore : IRefreshTokenStore
     {
         RefreshTokens.TryGetValue(key, out var token);
 
-        _logger.LogDebug($"Refresh token retrieved for key: {key}");
+        logger.LogDebug($"Refresh token retrieved for key: {key}");
         return Task.FromResult(token);
     }
 
@@ -36,9 +29,9 @@ public class InMemoryRefreshTokenStore : IRefreshTokenStore
         return Task.FromResult(tokens);
     }
 
-    public Task<List<KeyValuePair<string, RefreshToken>>> GetTokensByIdentifier(string identifier)
+    public Task<List<KeyValuePair<string, RefreshToken>>> GetTokensByIdentifier(string userIdentifier)
     {
-        var tokens = RefreshTokens.Where(x => x.Value.Identifier == identifier).ToList();
+        var tokens = RefreshTokens.Where(x => x.Value.UserIdentifier == userIdentifier).ToList();
         return Task.FromResult(tokens);
     }
 
@@ -46,7 +39,7 @@ public class InMemoryRefreshTokenStore : IRefreshTokenStore
     {
         RefreshTokens.TryRemove(key, out _);
 
-        _logger.LogDebug($"Refresh token removed for key: {key}");
+        logger.LogDebug($"Refresh token removed for key: {key}");
         return Task.CompletedTask;
     }
 }
