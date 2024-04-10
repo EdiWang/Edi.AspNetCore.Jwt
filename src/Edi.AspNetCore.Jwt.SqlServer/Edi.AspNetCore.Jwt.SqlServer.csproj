@@ -8,7 +8,7 @@
         <PackageTags>JWT</PackageTags>
         <PackageProjectUrl>https://edi.wang</PackageProjectUrl>
         <RepositoryUrl>https://github.com/EdiWang/Edi.AspNetCore.Jwt</RepositoryUrl>
-        <Version>0.10.0-beta.8</Version>
+        <Version>0.10.0-beta.9</Version>
         <Description>SQL Server storage provider for Edi.AspNetCore.Jwt</Description>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageIcon>edi-logo-blue.png</PackageIcon>
@@ -21,7 +21,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Edi.AspNetCore.Jwt" Version="0.10.0-beta.8" />
+        <PackageReference Include="Edi.AspNetCore.Jwt" Version="0.10.0-beta.9" />
         <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.0" />
     </ItemGroup>
 </Project>
