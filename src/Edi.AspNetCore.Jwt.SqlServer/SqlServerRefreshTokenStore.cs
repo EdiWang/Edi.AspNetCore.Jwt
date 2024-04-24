@@ -46,7 +46,7 @@ public class SqlServerRefreshTokenStore(string connectionString) : IRefreshToken
             return null;
         }
 
-        return new RefreshToken
+        return new()
         {
             UserIdentifier = reader.GetString(0),
             TokenString = reader.GetString(1),
@@ -69,9 +69,9 @@ public class SqlServerRefreshTokenStore(string connectionString) : IRefreshToken
         await using var reader = await command.ExecuteReaderAsync();
         while (await reader.ReadAsync())
         {
-            tokens.Add(new KeyValuePair<string, RefreshToken>(
+            tokens.Add(new(
                 reader.GetString(0),
-                new RefreshToken
+                new()
                 {
                     UserIdentifier = reader.GetString(1),
                     TokenString = reader.GetString(2),
@@ -92,14 +92,13 @@ public class SqlServerRefreshTokenStore(string connectionString) : IRefreshToken
         await using var command = _connection.CreateCommand();
         command.CommandText = "SELECT Id, TokenString, ExpireAt FROM RefreshTokens WHERE UserIdentifier = @UserIdentifier";
         command.AddParameter("@UserIdentifier", DbType.String, userIdentifier);
-        await command.ExecuteNonQueryAsync();
 
         await using var reader = await command.ExecuteReaderAsync();
         while (await reader.ReadAsync())
         {
-            tokens.Add(new KeyValuePair<string, RefreshToken>(
+            tokens.Add(new(
                                reader.GetString(0),
-                               new RefreshToken
+                               new()
                                {
                                    UserIdentifier = userIdentifier,
                                    TokenString = reader.GetString(1),
