@@ -2,11 +2,13 @@
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Edi.AspNetCore.Jwt;
 
-public class DefaultJwtAuthManager(JwtTokenConfig jwtTokenConfig, IRefreshTokenStore refreshTokenStore)
+public class DefaultJwtAuthManager(
+    JwtTokenConfig jwtTokenConfig, IRefreshTokenStore refreshTokenStore, ILogger<DefaultJwtAuthManager> logger)
     : IJwtAuthManager
 {
     public JwtTokenConfig JwtTokenConfig { get; } = jwtTokenConfig;
@@ -15,6 +17,8 @@ public class DefaultJwtAuthManager(JwtTokenConfig jwtTokenConfig, IRefreshTokenS
 
     public async Task RemoveExpiredRefreshTokens(DateTime utcNow)
     {
+        logger.LogInformation($"Removing expired refresh tokens before {utcNow} UTC.");
+
         var expiredTokens = await refreshTokenStore.GetTokensBefore(utcNow);
         foreach (var expiredToken in expiredTokens)
         {
@@ -33,6 +37,8 @@ public class DefaultJwtAuthManager(JwtTokenConfig jwtTokenConfig, IRefreshTokenS
 
     public async Task<JwtAuthResult> GenerateTokens(string userIdentifier, Claim[] claims, DateTime utcNow)
     {
+        logger.LogInformation($"Generating tokens for {userIdentifier}.");
+
         var shouldAddAudienceClaim = string.IsNullOrWhiteSpace(claims?.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Aud)?.Value);
         var jwtToken = new JwtSecurityToken(
             JwtTokenConfig.Issuer,
