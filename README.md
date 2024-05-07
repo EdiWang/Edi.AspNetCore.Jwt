@@ -7,13 +7,13 @@ JWT authentication library for my own
 ## Install from NuGet
 
 ```powershell
-dotnet add package Edi.AspNetCore.Jwt.InMemory --version 0.10.0-beta.8
+dotnet add package Edi.AspNetCore.Jwt.InMemory
 ```
 
 or
 
 ```powershell
-dotnet add package Edi.AspNetCore.Jwt.SqlServer --version 0.10.0-beta.8
+dotnet add package Edi.AspNetCore.Jwt.SqlServer
 ```
 
 ## Usage
