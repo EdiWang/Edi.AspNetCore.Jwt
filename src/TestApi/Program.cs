@@ -1,5 +1,4 @@
 using Edi.AspNetCore.Jwt;
-//using Edi.AspNetCore.Jwt.InMemory;
 using Edi.AspNetCore.Jwt.SqlServer;
 
 var builder = WebApplication.CreateBuilder(args);
