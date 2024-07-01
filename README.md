@@ -2,15 +2,15 @@
 
 [![.NET Build and Pack](https://github.com/EdiWang/Edi.AspNetCore.Jwt/actions/workflows/dotnet.yml/badge.svg)](https://github.com/EdiWang/Edi.AspNetCore.Jwt/actions/workflows/dotnet.yml)
 
-JWT authentication library for my own
+A very basic JWT authentication library for quickly integrating JWT authentication in ASP.NET Core applications.
 
-## Install from NuGet
+## Install
 
 ```powershell
-dotnet add package Edi.AspNetCore.Jwt.InMemory
+dotnet add package Edi.AspNetCore.Jwt
 ```
 
-or
+For SQL Server token storage, also
 
 ```powershell
 dotnet add package Edi.AspNetCore.Jwt.SqlServer
@@ -25,7 +25,8 @@ dotnet add package Edi.AspNetCore.Jwt.SqlServer
 ```csharp
 builder.Services.AddJwtAuth<DefaultJwtAuthManager>(builder.Configuration)
                 .AddInMemoryRefreshTokenStore(); 
-                // or .AddSqlServerRefreshTokenStore("DefaultConnection");
+                // For SQL Server token storage, also 
+                // .AddSqlServerRefreshTokenStore("DefaultConnection");
 ```
 
 #### `appsettings.json`
@@ -40,7 +41,7 @@ builder.Services.AddJwtAuth<DefaultJwtAuthManager>(builder.Configuration)
 }
 ```
 
-or with
+For SQL Server token storage, also
 
 ```json
 "ConnectionStrings": {
@@ -121,9 +122,9 @@ _jwtAuthManager.RemoveRefreshToken(email);
 
 ## 免责申明
 
-此项目(Edi.AspNetCore.Jwt)及其配套组件均为免费开源的产品，仅用于学习交流，并且不直接向中国提供服务，中国用户请于下载后立即删除。
+此项目及其配套组件均为免费开源的产品，仅用于学习交流，并且不直接向中国提供服务，中国访客请于下载后立即删除。
 
-任何中国境内的组织及个人不得使用此项目(Edi.AspNetCore.Jwt)及其配套组件构建任何形式的面向中国境内用户的网站或服务。
+任何中国境内的组织及个人不得使用此项目及其配套组件构建任何形式的面向中国境内访客的网站或服务。
 
 不可用于任何违反中华人民共和国(含台湾省)或使用者所在地区法律法规的用途。
 
