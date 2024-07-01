@@ -46,4 +46,10 @@ public static class ServiceCollectionExtensions
 
         return new(services, configuration);
     }
+
+    public static IServiceCollection AddInMemoryRefreshTokenStore(this JwtAuthServiceCollectionBuilder builder)
+    {
+        var services = builder.Services.AddSingleton<IRefreshTokenStore, InMemoryRefreshTokenStore>();
+        return services;
+    }
 }

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
 
-namespace Edi.AspNetCore.Jwt.InMemory;
+namespace Edi.AspNetCore.Jwt;
 
 public class InMemoryRefreshTokenStore(ILogger<InMemoryRefreshTokenStore> logger) : IRefreshTokenStore
 {
