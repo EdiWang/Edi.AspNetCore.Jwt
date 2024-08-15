@@ -10,7 +10,6 @@ public class SqlServerRefreshTokenStore(string connectionString) : IRefreshToken
     public async Task AddOrUpdate(string key, RefreshToken token)
     {
         await OpenConnectionAsync();
-        EnsureRefreshTokenTableCreated();
 
         await using var command = _connection.CreateCommand();
         command.CommandText = @"
@@ -34,7 +33,6 @@ public class SqlServerRefreshTokenStore(string connectionString) : IRefreshToken
     public async Task<RefreshToken> Get(string key)
     {
         await OpenConnectionAsync();
-        EnsureRefreshTokenTableCreated();
 
         await using var command = _connection.CreateCommand();
         command.CommandText = "SELECT UserIdentifier, TokenString, ExpireAt FROM RefreshTokens WHERE Id = @Id";
@@ -57,7 +55,6 @@ public class SqlServerRefreshTokenStore(string connectionString) : IRefreshToken
     public async Task<List<KeyValuePair<string, RefreshToken>>> GetTokensBefore(DateTime time)
     {
         await OpenConnectionAsync();
-        EnsureRefreshTokenTableCreated();
 
         var tokens = new List<KeyValuePair<string, RefreshToken>>();
 
@@ -85,7 +82,6 @@ public class SqlServerRefreshTokenStore(string connectionString) : IRefreshToken
     public async Task<List<KeyValuePair<string, RefreshToken>>> GetTokensByIdentifier(string userIdentifier)
     {
         await OpenConnectionAsync();
-        EnsureRefreshTokenTableCreated();
 
         var tokens = new List<KeyValuePair<string, RefreshToken>>();
 
@@ -112,7 +108,6 @@ public class SqlServerRefreshTokenStore(string connectionString) : IRefreshToken
     public async Task Remove(string key)
     {
         await OpenConnectionAsync();
-        EnsureRefreshTokenTableCreated();
 
         await using var command = _connection.CreateCommand();
         command.CommandText = "DELETE FROM RefreshTokens WHERE Id = @Id";
@@ -125,23 +120,6 @@ public class SqlServerRefreshTokenStore(string connectionString) : IRefreshToken
     {
         _connection?.Close();
         _connection?.Dispose();
-    }
-
-    private void EnsureRefreshTokenTableCreated()
-    {
-        using var command = _connection.CreateCommand();
-        command.CommandText = @"
-            IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = 'RefreshTokens')
-            BEGIN
-                CREATE TABLE RefreshTokens
-                (
-                    Id VARCHAR(64) PRIMARY KEY NOT NULL,
-                    UserIdentifier NVARCHAR(450) NOT NULL,
-                    TokenString NVARCHAR(MAX) NOT NULL,
-                    ExpireAt DATETIME NOT NULL
-                )
-            END";
-        command.ExecuteNonQuery();
     }
 
     private async Task OpenConnectionAsync()
