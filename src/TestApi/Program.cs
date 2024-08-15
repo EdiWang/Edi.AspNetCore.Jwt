@@ -5,8 +5,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddJwtAuth<DefaultJwtAuthManager>(builder.Configuration)
-                .AddSqlServerRefreshTokenStore("DefaultConnection");
-//.AddInMemoryRefreshTokenStore();
+                //.AddSqlServerRefreshTokenStore("DefaultConnection");
+                .AddInMemoryRefreshTokenStore();
 
 var app = builder.Build();
 
