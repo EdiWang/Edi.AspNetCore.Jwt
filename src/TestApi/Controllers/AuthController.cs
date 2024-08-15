@@ -1,9 +1,9 @@
-﻿using System.Net.Http.Headers;
-using System.Security.Claims;
-using Edi.AspNetCore.Jwt;
+﻿using Edi.AspNetCore.Jwt;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using System.Net.Http.Headers;
+using System.Security.Claims;
 
 namespace TestApi.Controllers;
 
