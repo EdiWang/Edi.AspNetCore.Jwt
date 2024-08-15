@@ -55,7 +55,7 @@ public class DefaultJwtAuthManager(
             ExpireAt = utcNow.AddMinutes(JwtTokenConfig.RefreshTokenExpiration)
         };
 
-        await refreshTokenStore.AddOrUpdate(refreshToken.TokenString, refreshToken);
+        await refreshTokenStore.AddOrUpdate(Guid.NewGuid().ToString(), refreshToken);
 
         return new()
         {

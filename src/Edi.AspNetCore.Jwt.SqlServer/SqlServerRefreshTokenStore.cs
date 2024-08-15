@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.DataProtection.KeyManagement;
-using Microsoft.Data.SqlClient;
+﻿using Microsoft.Data.SqlClient;
 using System.Data;
 
 namespace Edi.AspNetCore.Jwt.SqlServer;
@@ -31,13 +30,13 @@ public class SqlServerRefreshTokenStore(string connectionString) : IRefreshToken
         await command.ExecuteNonQueryAsync();
     }
 
-    public async Task<RefreshToken> Get(string key)
+    public async Task<RefreshToken> Get(string token)
     {
         await OpenConnectionAsync();
 
         await using var command = _connection.CreateCommand();
-        command.CommandText = "SELECT UserIdentifier, TokenString, ExpireAt FROM RefreshTokens WHERE Id = @Id";
-        command.AddParameter("@Id", DbType.String, key);
+        command.CommandText = "SELECT UserIdentifier, TokenString, ExpireAt FROM RefreshTokens WHERE TokenString = @TokenString";
+        command.AddParameter("@TokenString", DbType.String, token);
 
         await using var reader = await command.ExecuteReaderAsync();
         if (!await reader.ReadAsync())

@@ -15,12 +15,10 @@ public class InMemoryRefreshTokenStore(ILogger<InMemoryRefreshTokenStore> logger
         return Task.CompletedTask;
     }
 
-    public Task<RefreshToken> Get(string key)
+    public Task<RefreshToken> Get(string token)
     {
-        RefreshTokens.TryGetValue(key, out var token);
-
-        logger.LogTrace($"Refresh token retrieved for key: {key}");
-        return Task.FromResult(token);
+        var item = RefreshTokens.FirstOrDefault(p => p.Value.TokenString == token);
+        return Task.FromResult(item.Value);
     }
 
     public Task<List<KeyValuePair<string, RefreshToken>>> GetTokensBefore(DateTime time)
