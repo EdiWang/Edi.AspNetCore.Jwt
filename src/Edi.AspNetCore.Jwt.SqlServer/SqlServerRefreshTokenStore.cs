@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using Microsoft.AspNetCore.DataProtection.KeyManagement;
+using Microsoft.Data.SqlClient;
 using System.Data;
 
 namespace Edi.AspNetCore.Jwt.SqlServer;
@@ -112,6 +113,16 @@ public class SqlServerRefreshTokenStore(string connectionString) : IRefreshToken
         await using var command = _connection.CreateCommand();
         command.CommandText = "DELETE FROM RefreshTokens WHERE Id = @Id";
         command.AddParameter("@Id", DbType.String, key);
+
+        await command.ExecuteNonQueryAsync();
+    }
+
+    public async Task Clear()
+    {
+        await OpenConnectionAsync();
+
+        await using var command = _connection.CreateCommand();
+        command.CommandText = "DELETE FROM RefreshTokens";
 
         await command.ExecuteNonQueryAsync();
     }

@@ -11,7 +11,7 @@ public class InMemoryRefreshTokenStore(ILogger<InMemoryRefreshTokenStore> logger
     {
         RefreshTokens.AddOrUpdate(key, token, (_, _) => token);
 
-        logger.LogDebug($"Refresh token added or updated for key: {key}");
+        logger.LogTrace($"Refresh token added or updated for key: {key}");
         return Task.CompletedTask;
     }
 
@@ -19,7 +19,7 @@ public class InMemoryRefreshTokenStore(ILogger<InMemoryRefreshTokenStore> logger
     {
         RefreshTokens.TryGetValue(key, out var token);
 
-        logger.LogDebug($"Refresh token retrieved for key: {key}");
+        logger.LogTrace($"Refresh token retrieved for key: {key}");
         return Task.FromResult(token);
     }
 
@@ -39,7 +39,15 @@ public class InMemoryRefreshTokenStore(ILogger<InMemoryRefreshTokenStore> logger
     {
         RefreshTokens.TryRemove(key, out _);
 
-        logger.LogDebug($"Refresh token removed for key: {key}");
+        logger.LogTrace($"Refresh token removed for key: {key}");
+        return Task.CompletedTask;
+    }
+
+    public Task Clear()
+    {
+        RefreshTokens.Clear();
+
+        logger.LogTrace("Refresh tokens cleared");
         return Task.CompletedTask;
     }
 }

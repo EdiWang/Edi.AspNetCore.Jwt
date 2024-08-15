@@ -11,4 +11,6 @@ public interface IRefreshTokenStore
     public Task<List<KeyValuePair<string, RefreshToken>>> GetTokensByIdentifier(string userIdentifier);
 
     public Task Remove(string key);
+
+    public Task Clear();
 }
