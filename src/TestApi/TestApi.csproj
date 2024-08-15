@@ -1,12 +1,15 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Edi.AspNetCore.Jwt\Edi.AspNetCore.Jwt.csproj" />
+    </ItemGroup>
+
     <ItemGroup Condition="'$(Configuration)' != 'Release'">
         <ProjectReference Include="..\Edi.AspNetCore.Jwt.SqlServer\Edi.AspNetCore.Jwt.SqlServer.csproj" />
     </ItemGroup>
-
 </Project>
