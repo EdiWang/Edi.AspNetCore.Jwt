@@ -105,6 +105,24 @@ public class SqlServerRefreshTokenStore(string connectionString) : IRefreshToken
         return tokens;
     }
 
+    public async Task RemoveNonLatestTokens(string userIdentifier)
+    {
+        await OpenConnectionAsync();
+
+        await using var command = _connection.CreateCommand();
+        command.CommandText = @"
+            WITH LatestTokens AS (
+                SELECT Id, ROW_NUMBER() OVER (PARTITION BY UserIdentifier ORDER BY ExpireAt DESC) AS RowNumber
+                FROM RefreshTokens
+                WHERE UserIdentifier = @UserIdentifier
+            )
+            DELETE FROM LatestTokens WHERE RowNumber > 1;";
+
+        command.AddParameter("@UserIdentifier", DbType.String, userIdentifier);
+
+        await command.ExecuteNonQueryAsync();
+    }
+
     public async Task Remove(string key)
     {
         await OpenConnectionAsync();

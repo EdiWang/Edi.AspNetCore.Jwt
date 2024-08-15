@@ -32,6 +32,7 @@ public class AuthController(IJwtAuthManager jwtAuthManager) : ControllerBase
         };
 
         var jwtResult = await jwtAuthManager.GenerateTokens(request.Email, claims.ToArray(), DateTime.UtcNow);
+        await jwtAuthManager.RemoveNotLatestRefreshTokens(request.Email);
 
         SetRefreshTokenCookie(jwtResult.RefreshToken.TokenString);
 
@@ -62,6 +63,9 @@ public class AuthController(IJwtAuthManager jwtAuthManager) : ControllerBase
 
             //var accessToken = await HttpContext.GetTokenAsync("Bearer", "access_token");
             var jwtResult = await jwtAuthManager.Refresh(refreshToken, accessToken.Parameter, ClaimTypes.Email, DateTime.UtcNow);
+
+            var userIdentifier = User.Claims.First(p => p.Type == ClaimTypes.Email).Value;
+            await jwtAuthManager.RemoveNotLatestRefreshTokens(userIdentifier);
 
             SetRefreshTokenCookie(jwtResult.RefreshToken.TokenString);
 

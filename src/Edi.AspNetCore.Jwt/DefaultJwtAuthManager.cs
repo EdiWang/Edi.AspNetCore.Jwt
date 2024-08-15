@@ -35,6 +35,11 @@ public class DefaultJwtAuthManager(
         }
     }
 
+    public Task RemoveNotLatestRefreshTokens(string userIdentifier)
+    {
+        return refreshTokenStore.RemoveNonLatestTokens(userIdentifier);
+    }
+
     public async Task<JwtAuthResult> GenerateTokens(string userIdentifier, Claim[] claims, DateTime utcNow)
     {
         logger.LogInformation($"Generating tokens for {userIdentifier}.");

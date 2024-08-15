@@ -33,6 +33,22 @@ public class InMemoryRefreshTokenStore(ILogger<InMemoryRefreshTokenStore> logger
         return Task.FromResult(tokens);
     }
 
+    public Task RemoveNonLatestTokens(string userIdentifier)
+    {
+        var tokens = RefreshTokens.Where(x => x.Value.UserIdentifier == userIdentifier).ToList();
+        if (tokens.Count > 1)
+        {
+            var nonLatestTokens = tokens.OrderByDescending(x => x.Value.ExpireAt).Skip(1).ToList();
+            foreach (var token in nonLatestTokens)
+            {
+                RefreshTokens.TryRemove(token.Key, out _);
+            }
+        }
+
+        logger.LogTrace($"Non-latest refresh tokens removed for user identifier: {userIdentifier}");
+        return Task.CompletedTask;
+    }
+
     public Task Remove(string key)
     {
         RefreshTokens.TryRemove(key, out _);

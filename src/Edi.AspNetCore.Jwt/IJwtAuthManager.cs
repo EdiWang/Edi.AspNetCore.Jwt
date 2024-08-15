@@ -10,5 +10,6 @@ public interface IJwtAuthManager
     Task<RefreshTokenResult> Refresh(string refreshToken, string accessToken, string claimName, DateTime utcNow);
     Task RemoveExpiredRefreshTokens(DateTime utcNow);
     Task RemoveRefreshToken(string identifier);
+    Task RemoveNotLatestRefreshTokens(string userIdentifier);
     (ClaimsPrincipal, JwtSecurityToken) DecodeJwtToken(string token);
 }
