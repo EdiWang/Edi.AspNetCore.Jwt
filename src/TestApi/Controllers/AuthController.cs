@@ -4,13 +4,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.Net.Http.Headers;
 using System.Security.Claims;
+using System.Text.Json;
 
 namespace TestApi.Controllers;
 
 [ApiController]
 [Authorize]
 [Route("api/[controller]")]
-public class AuthController(IJwtAuthManager jwtAuthManager) : ControllerBase
+public class AuthController(IJwtAuthManager jwtAuthManager, ILogger<AuthController> logger) : ControllerBase
 {
     [AllowAnonymous]
     [HttpPost("login")]
@@ -31,7 +32,13 @@ public class AuthController(IJwtAuthManager jwtAuthManager) : ControllerBase
             new("CustomValue", "test")
         };
 
-        var jwtResult = await jwtAuthManager.GenerateTokens(request.Email, claims.ToArray(), DateTime.UtcNow);
+        var additionalInfo = new RefreshTokenAdditionalInfo
+        {
+            IPAddress = HttpContext.Connection.RemoteIpAddress?.ToString()
+        };
+
+        var jwtResult = await jwtAuthManager.GenerateTokens(request.Email, claims.ToArray(), DateTime.UtcNow, JsonSerializer.Serialize(additionalInfo));
+
         await jwtAuthManager.RemoveNotLatestRefreshTokens(request.Email);
 
         SetRefreshTokenCookie(jwtResult.RefreshToken.TokenString);
@@ -61,8 +68,21 @@ public class AuthController(IJwtAuthManager jwtAuthManager) : ControllerBase
             var parseAuthHeader = AuthenticationHeaderValue.TryParse(authHeaderValue, out var accessToken);
             if (!parseAuthHeader) return Unauthorized("Unable to parse Authorization header");
 
+            // Optionally, you can get the additional information from the refresh token
+            var oldAdditionalInfo = await jwtAuthManager.GetAdditionalInfo(refreshToken);
+            if (oldAdditionalInfo != null)
+            {
+                // do something with AdditionalInfo
+                logger.LogInformation(oldAdditionalInfo);
+            }
+
+            var additionalInfo = new RefreshTokenAdditionalInfo
+            {
+                IPAddress = HttpContext.Connection.RemoteIpAddress?.ToString()
+            };
+
             //var accessToken = await HttpContext.GetTokenAsync("Bearer", "access_token");
-            var jwtResult = await jwtAuthManager.Refresh(refreshToken, accessToken.Parameter, ClaimTypes.Email, DateTime.UtcNow);
+            var jwtResult = await jwtAuthManager.Refresh(refreshToken, accessToken.Parameter, ClaimTypes.Email, DateTime.UtcNow, JsonSerializer.Serialize(additionalInfo));
 
             var userIdentifier = User.Claims.First(p => p.Type == ClaimTypes.Email).Value;
             await jwtAuthManager.RemoveNotLatestRefreshTokens(userIdentifier);
@@ -119,4 +139,9 @@ public class LoginResult
     public Guid UserId { get; set; }
     public string Email { get; set; } = string.Empty;
     public string AccessToken { get; set; }
+}
+
+public class RefreshTokenAdditionalInfo
+{
+    public string IPAddress { get; set; }
 }
