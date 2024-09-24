@@ -26,7 +26,7 @@ public class SqlServerRefreshTokenStore(string connectionString) : IRefreshToken
         command.AddParameter("@UserIdentifier", DbType.String, token.UserIdentifier);
         command.AddParameter("@TokenString", DbType.String, token.TokenString);
         command.AddParameter("@ExpireAt", DbType.DateTime, token.ExpireAt);
-        command.AddParameter("@AdditionalInfo", DbType.String, token.AdditionalInfo);
+        command.AddParameter("@AdditionalInfo", DbType.String, token.AdditionalInfo == null ? DBNull.Value : token.AdditionalInfo);
 
         await command.ExecuteNonQueryAsync();
     }
