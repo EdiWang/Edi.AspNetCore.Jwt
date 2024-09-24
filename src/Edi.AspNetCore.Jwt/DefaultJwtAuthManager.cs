@@ -15,6 +15,12 @@ public class DefaultJwtAuthManager(
 
     private readonly byte[] _secret = Encoding.ASCII.GetBytes(jwtTokenConfig.Secret);
 
+    public async Task<string> GetAdditionalInfo(string refreshToken)
+    {
+        var existingRefreshToken = await refreshTokenStore.Get(refreshToken);
+        return existingRefreshToken?.AdditionalInfo;
+    }
+
     public async Task RemoveExpiredRefreshTokens(DateTime utcNow)
     {
         logger.LogInformation($"Removing expired refresh tokens before {utcNow} UTC.");
@@ -70,7 +76,7 @@ public class DefaultJwtAuthManager(
         };
     }
 
-    public async Task<RefreshTokenResult> Refresh(string refreshToken, string accessToken, string claimName, DateTime utcNow)
+    public async Task<RefreshTokenResult> Refresh(string refreshToken, string accessToken, string claimName, DateTime utcNow, string additionalInfo = null)
     {
         ClaimsPrincipal principal = null;
 
@@ -102,7 +108,7 @@ public class DefaultJwtAuthManager(
             throw new SecurityTokenException("Invalid token");
         }
 
-        var tokens = await GenerateTokens(identifier, principal.Claims.ToArray(), utcNow);
+        var tokens = await GenerateTokens(identifier, principal.Claims.ToArray(), utcNow, additionalInfo);
 
         return new()
         {
