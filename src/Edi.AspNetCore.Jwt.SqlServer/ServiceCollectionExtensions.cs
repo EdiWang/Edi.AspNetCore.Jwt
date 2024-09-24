@@ -29,7 +29,8 @@ public static class ServiceCollectionExtensions
                     Id VARCHAR(64) PRIMARY KEY NOT NULL,
                     UserIdentifier NVARCHAR(450) NOT NULL,
                     TokenString NVARCHAR(MAX) NOT NULL,
-                    ExpireAt DATETIME NOT NULL
+                    ExpireAt DATETIME NOT NULL,
+                    AdditionalInfo NVARCHAR(996) NULL
                 )
             END";
         command.ExecuteNonQuery();
