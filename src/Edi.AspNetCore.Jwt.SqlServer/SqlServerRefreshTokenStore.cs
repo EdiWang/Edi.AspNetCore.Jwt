@@ -14,18 +14,19 @@ public class SqlServerRefreshTokenStore(string connectionString) : IRefreshToken
         await using var command = _connection.CreateCommand();
         command.CommandText = @"
             MERGE INTO RefreshTokens AS target
-            USING (SELECT @Id, @UserIdentifier, @TokenString, @ExpireAt) AS source (Id, UserIdentifier, TokenString, ExpireAt)
+            USING (SELECT @Id, @UserIdentifier, @TokenString, @ExpireAt, @AdditionalInfo) AS source (Id, UserIdentifier, TokenString, ExpireAt, AdditionalInfo)
             ON target.Id = source.Id
             WHEN MATCHED THEN
-                UPDATE SET TokenString = source.TokenString, ExpireAt = source.ExpireAt
+                UPDATE SET TokenString = source.TokenString, ExpireAt = source.ExpireAt, AdditionalInfo = source.AdditionalInfo
             WHEN NOT MATCHED THEN
-                INSERT (Id, UserIdentifier, TokenString, ExpireAt)
-                VALUES (source.Id, source.UserIdentifier, source.TokenString, source.ExpireAt);";
+                INSERT (Id, UserIdentifier, TokenString, ExpireAt, AdditionalInfo)
+                VALUES (source.Id, source.UserIdentifier, source.TokenString, source.ExpireAt, source.AdditionalInfo);";
 
         command.AddParameter("@Id", DbType.String, key);
         command.AddParameter("@UserIdentifier", DbType.String, token.UserIdentifier);
         command.AddParameter("@TokenString", DbType.String, token.TokenString);
         command.AddParameter("@ExpireAt", DbType.DateTime, token.ExpireAt);
+        command.AddParameter("@AdditionalInfo", DbType.String, token.AdditionalInfo);
 
         await command.ExecuteNonQueryAsync();
     }
@@ -35,7 +36,7 @@ public class SqlServerRefreshTokenStore(string connectionString) : IRefreshToken
         await OpenConnectionAsync();
 
         await using var command = _connection.CreateCommand();
-        command.CommandText = "SELECT UserIdentifier, TokenString, ExpireAt FROM RefreshTokens WHERE TokenString = @TokenString";
+        command.CommandText = "SELECT UserIdentifier, TokenString, ExpireAt, AdditionalInfo FROM RefreshTokens WHERE TokenString = @TokenString";
         command.AddParameter("@TokenString", DbType.String, token);
 
         await using var reader = await command.ExecuteReaderAsync();
@@ -48,7 +49,8 @@ public class SqlServerRefreshTokenStore(string connectionString) : IRefreshToken
         {
             UserIdentifier = reader.GetString(0),
             TokenString = reader.GetString(1),
-            ExpireAt = reader.GetDateTime(2)
+            ExpireAt = reader.GetDateTime(2),
+            AdditionalInfo = reader.GetString(3)
         };
     }
 
@@ -59,7 +61,7 @@ public class SqlServerRefreshTokenStore(string connectionString) : IRefreshToken
         var tokens = new List<KeyValuePair<string, RefreshToken>>();
 
         await using var command = _connection.CreateCommand();
-        command.CommandText = "SELECT Id, UserIdentifier, TokenString, ExpireAt FROM RefreshTokens WHERE ExpireAt < @ExpireAt";
+        command.CommandText = "SELECT Id, UserIdentifier, TokenString, ExpireAt, AdditionalInfo FROM RefreshTokens WHERE ExpireAt < @ExpireAt";
         command.AddParameter("@ExpireAt", DbType.DateTime, time);
         await command.ExecuteNonQueryAsync();
 
@@ -72,7 +74,8 @@ public class SqlServerRefreshTokenStore(string connectionString) : IRefreshToken
                 {
                     UserIdentifier = reader.GetString(1),
                     TokenString = reader.GetString(2),
-                    ExpireAt = reader.GetDateTime(3)
+                    ExpireAt = reader.GetDateTime(3),
+                    AdditionalInfo = reader.GetString(4)
                 }));
         }
 
@@ -86,7 +89,7 @@ public class SqlServerRefreshTokenStore(string connectionString) : IRefreshToken
         var tokens = new List<KeyValuePair<string, RefreshToken>>();
 
         await using var command = _connection.CreateCommand();
-        command.CommandText = "SELECT Id, TokenString, ExpireAt FROM RefreshTokens WHERE UserIdentifier = @UserIdentifier";
+        command.CommandText = "SELECT Id, TokenString, ExpireAt, AdditionalInfo FROM RefreshTokens WHERE UserIdentifier = @UserIdentifier";
         command.AddParameter("@UserIdentifier", DbType.String, userIdentifier);
 
         await using var reader = await command.ExecuteReaderAsync();
@@ -98,7 +101,8 @@ public class SqlServerRefreshTokenStore(string connectionString) : IRefreshToken
                                {
                                    UserIdentifier = userIdentifier,
                                    TokenString = reader.GetString(1),
-                                   ExpireAt = reader.GetDateTime(2)
+                                   ExpireAt = reader.GetDateTime(2),
+                                   AdditionalInfo = reader.GetString(3)
                                }));
         }
 
