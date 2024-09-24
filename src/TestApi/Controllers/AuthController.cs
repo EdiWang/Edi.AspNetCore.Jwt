@@ -87,6 +87,8 @@ public class AuthController(IJwtAuthManager jwtAuthManager) : ControllerBase
         var email = User.FindFirst(p => p.Type == ClaimTypes.Email)?.Value;
         await jwtAuthManager.RemoveRefreshToken(email);
 
+        ClearRefreshTokenCookie();
+
         return Ok();
     }
 
@@ -101,6 +103,8 @@ public class AuthController(IJwtAuthManager jwtAuthManager) : ControllerBase
         };
         Response.Cookies.Append("refreshToken", token, cookieOptions);
     }
+
+    private void ClearRefreshTokenCookie() => Response.Cookies.Delete("refreshToken");
 }
 
 public class LoginRequest
