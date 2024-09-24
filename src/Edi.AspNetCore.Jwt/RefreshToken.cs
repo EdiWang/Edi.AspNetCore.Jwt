@@ -7,4 +7,6 @@ public record RefreshToken
     public string TokenString { get; set; }
 
     public DateTime ExpireAt { get; set; }
+
+    public string AdditionalInfo { get; set; }
 }
