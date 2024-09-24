@@ -40,7 +40,7 @@ public class DefaultJwtAuthManager(
         return refreshTokenStore.RemoveNonLatestTokens(userIdentifier);
     }
 
-    public async Task<JwtAuthResult> GenerateTokens(string userIdentifier, Claim[] claims, DateTime utcNow)
+    public async Task<JwtAuthResult> GenerateTokens(string userIdentifier, Claim[] claims, DateTime utcNow, string additionalInfo = null)
     {
         logger.LogInformation($"Generating tokens for {userIdentifier}.");
 
@@ -57,7 +57,8 @@ public class DefaultJwtAuthManager(
         {
             UserIdentifier = userIdentifier,
             TokenString = GenerateRefreshTokenString(),
-            ExpireAt = utcNow.AddMinutes(JwtTokenConfig.RefreshTokenExpiration)
+            ExpireAt = utcNow.AddMinutes(JwtTokenConfig.RefreshTokenExpiration),
+            AdditionalInfo = additionalInfo
         };
 
         await refreshTokenStore.AddOrUpdate(Guid.NewGuid().ToString(), refreshToken);
