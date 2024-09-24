@@ -25,7 +25,7 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(Configuration)' == 'Release'">
-        <PackageReference Include="Edi.AspNetCore.Jwt" Version="1.0.0" />
+        <PackageReference Include="Edi.AspNetCore.Jwt" Version="1.1.0" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(Configuration)' != 'Release'">
