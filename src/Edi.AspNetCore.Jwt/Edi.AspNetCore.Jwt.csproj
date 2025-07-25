@@ -8,7 +8,7 @@
         <PackageTags>JWT</PackageTags>
         <PackageProjectUrl>https://edi.wang</PackageProjectUrl>
         <RepositoryUrl>https://github.com/EdiWang/Edi.AspNetCore.Jwt</RepositoryUrl>
-        <Version>1.3.3</Version>
+        <Version>1.3.4</Version>
         <Description>JWT authentication library for my own</Description>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageIcon>edi-logo-blue.png</PackageIcon>
@@ -16,11 +16,11 @@
     </PropertyGroup>
 
     <ItemGroup Condition=" '$(TargetFramework)' == 'net8.0' ">
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.17" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.18" />
     </ItemGroup>
 
     <ItemGroup Condition=" '$(TargetFramework)' == 'net9.0' ">
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.6" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.7" />
     </ItemGroup>
 
     <ItemGroup>
