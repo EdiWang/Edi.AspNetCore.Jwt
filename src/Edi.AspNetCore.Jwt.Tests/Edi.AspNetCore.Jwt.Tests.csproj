@@ -4,7 +4,6 @@
     <TargetFramework>net8.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
     <EnableMSTestRunner>true</EnableMSTestRunner>
     <OutputType>Exe</OutputType>
     <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
@@ -21,6 +20,10 @@
     <PackageReference Include="Microsoft.Testing.Extensions.TrxReport" Version="1.8.1" />
     <PackageReference Include="Moq" Version="4.20.72" />
     <PackageReference Include="MSTest" Version="3.10.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Edi.AspNetCore.Jwt\Edi.AspNetCore.Jwt.csproj" />
   </ItemGroup>
 
   <ItemGroup>
