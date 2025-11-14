@@ -25,7 +25,7 @@ public class InMemoryRefreshTokenStoreTests
 
         // Assert
         Assert.IsNotNull(store.RefreshTokens);
-        Assert.AreEqual(0, store.RefreshTokens.Count);
+        Assert.IsEmpty(store.RefreshTokens);
     }
 
     [TestMethod]
@@ -45,7 +45,7 @@ public class InMemoryRefreshTokenStoreTests
         await _refreshTokenStore.AddOrUpdate(key, token);
 
         // Assert
-        Assert.AreEqual(1, _refreshTokenStore.RefreshTokens.Count);
+        Assert.HasCount(1, _refreshTokenStore.RefreshTokens);
         Assert.IsTrue(_refreshTokenStore.RefreshTokens.ContainsKey(key));
         Assert.AreEqual(token, _refreshTokenStore.RefreshTokens[key]);
     }
@@ -76,7 +76,7 @@ public class InMemoryRefreshTokenStoreTests
         await _refreshTokenStore.AddOrUpdate(key, updatedToken);
 
         // Assert
-        Assert.AreEqual(1, _refreshTokenStore.RefreshTokens.Count);
+        Assert.HasCount(1, _refreshTokenStore.RefreshTokens);
         Assert.AreEqual(updatedToken, _refreshTokenStore.RefreshTokens[key]);
         Assert.AreEqual("user456", _refreshTokenStore.RefreshTokens[key].UserIdentifier);
         Assert.AreEqual("updated-info", _refreshTokenStore.RefreshTokens[key].AdditionalInfo);
@@ -181,7 +181,7 @@ public class InMemoryRefreshTokenStoreTests
         var result = await _refreshTokenStore.GetTokensBefore(_utcNow);
 
         // Assert
-        Assert.AreEqual(2, result.Count);
+        Assert.HasCount(2, result);
         Assert.IsTrue(result.Any(x => x.Key == "key1" && x.Value == expiredToken1));
         Assert.IsTrue(result.Any(x => x.Key == "key2" && x.Value == expiredToken2));
         Assert.IsFalse(result.Any(x => x.Key == "key3"));
@@ -204,7 +204,7 @@ public class InMemoryRefreshTokenStoreTests
         var result = await _refreshTokenStore.GetTokensBefore(_utcNow);
 
         // Assert
-        Assert.AreEqual(0, result.Count);
+        Assert.IsEmpty(result);
     }
 
     [TestMethod]
@@ -242,7 +242,7 @@ public class InMemoryRefreshTokenStoreTests
         var result = await _refreshTokenStore.GetTokensByIdentifier(userIdentifier);
 
         // Assert
-        Assert.AreEqual(2, result.Count);
+        Assert.HasCount(2, result);
         Assert.IsTrue(result.Any(x => x.Value == userToken1));
         Assert.IsTrue(result.Any(x => x.Value == userToken2));
         Assert.IsFalse(result.Any(x => x.Value == otherUserToken));
@@ -266,7 +266,7 @@ public class InMemoryRefreshTokenStoreTests
         var result = await _refreshTokenStore.GetTokensByIdentifier(userIdentifier);
 
         // Assert
-        Assert.AreEqual(0, result.Count);
+        Assert.IsEmpty(result);
     }
 
     [TestMethod]
@@ -304,7 +304,7 @@ public class InMemoryRefreshTokenStoreTests
         await _refreshTokenStore.RemoveNonLatestTokens(userIdentifier);
 
         // Assert
-        Assert.AreEqual(1, _refreshTokenStore.RefreshTokens.Count);
+        Assert.HasCount(1, _refreshTokenStore.RefreshTokens);
         Assert.IsTrue(_refreshTokenStore.RefreshTokens.ContainsKey("key3"));
         Assert.AreEqual(latestToken, _refreshTokenStore.RefreshTokens["key3"]);
         Assert.IsFalse(_refreshTokenStore.RefreshTokens.ContainsKey("key1"));
@@ -329,7 +329,7 @@ public class InMemoryRefreshTokenStoreTests
         await _refreshTokenStore.RemoveNonLatestTokens(userIdentifier);
 
         // Assert
-        Assert.AreEqual(1, _refreshTokenStore.RefreshTokens.Count);
+        Assert.HasCount(1, _refreshTokenStore.RefreshTokens);
         Assert.IsTrue(_refreshTokenStore.RefreshTokens.ContainsKey("key1"));
     }
 
@@ -349,7 +349,7 @@ public class InMemoryRefreshTokenStoreTests
 
         // Act & Assert
         await _refreshTokenStore.RemoveNonLatestTokens(userIdentifier);
-        Assert.AreEqual(1, _refreshTokenStore.RefreshTokens.Count);
+        Assert.HasCount(1, _refreshTokenStore.RefreshTokens);
     }
 
     [TestMethod]
@@ -370,7 +370,7 @@ public class InMemoryRefreshTokenStoreTests
         await _refreshTokenStore.Remove(key);
 
         // Assert
-        Assert.AreEqual(0, _refreshTokenStore.RefreshTokens.Count);
+        Assert.IsEmpty(_refreshTokenStore.RefreshTokens);
         Assert.IsFalse(_refreshTokenStore.RefreshTokens.ContainsKey(key));
     }
 
@@ -390,7 +390,7 @@ public class InMemoryRefreshTokenStoreTests
 
         // Act & Assert
         await _refreshTokenStore.Remove(nonExistingKey);
-        Assert.AreEqual(1, _refreshTokenStore.RefreshTokens.Count);
+        Assert.HasCount(1, _refreshTokenStore.RefreshTokens);
     }
 
     [TestMethod]
@@ -419,7 +419,7 @@ public class InMemoryRefreshTokenStoreTests
         await _refreshTokenStore.Clear();
 
         // Assert
-        Assert.AreEqual(0, _refreshTokenStore.RefreshTokens.Count);
+        Assert.IsEmpty(_refreshTokenStore.RefreshTokens);
     }
 
     [TestMethod]
@@ -427,7 +427,7 @@ public class InMemoryRefreshTokenStoreTests
     {
         // Act & Assert
         await _refreshTokenStore.Clear();
-        Assert.AreEqual(0, _refreshTokenStore.RefreshTokens.Count);
+        Assert.IsEmpty(_refreshTokenStore.RefreshTokens);
     }
 
     [TestMethod]
@@ -457,7 +457,7 @@ public class InMemoryRefreshTokenStoreTests
         await Task.WhenAll(tasks);
 
         // Assert
-        Assert.AreEqual(tokenCount, _refreshTokenStore.RefreshTokens.Count);
+        Assert.HasCount(tokenCount, _refreshTokenStore.RefreshTokens);
     }
 
     [TestMethod]
