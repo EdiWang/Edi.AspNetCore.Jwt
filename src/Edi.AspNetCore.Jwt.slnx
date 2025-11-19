@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/Lib/">
+    <Project Path="Edi.AspNetCore.Jwt.SqlServer/Edi.AspNetCore.Jwt.SqlServer.csproj" />
+    <Project Path="Edi.AspNetCore.Jwt/Edi.AspNetCore.Jwt.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path="../.github/workflows/dotnet.yml" />
+    <File Path="../README.md" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="Edi.AspNetCore.Jwt.Tests/Edi.AspNetCore.Jwt.Tests.csproj" />
+    <Project Path="TestApi/TestApi.csproj" />
+  </Folder>
+</Solution>
