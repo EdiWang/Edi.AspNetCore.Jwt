@@ -3,32 +3,30 @@ using Moq;
 
 namespace Edi.AspNetCore.Jwt.Tests;
 
-[TestClass]
 public class InMemoryRefreshTokenStoreTests
 {
-    private Mock<ILogger<InMemoryRefreshTokenStore>> _mockLogger;
-    private InMemoryRefreshTokenStore _refreshTokenStore;
+    private readonly Mock<ILogger<InMemoryRefreshTokenStore>> _mockLogger;
+    private readonly InMemoryRefreshTokenStore _refreshTokenStore;
     private readonly DateTime _utcNow = new(2030, 1, 1, 12, 0, 0, DateTimeKind.Utc);
 
-    [TestInitialize]
-    public void Setup()
+    public InMemoryRefreshTokenStoreTests()
     {
         _mockLogger = new Mock<ILogger<InMemoryRefreshTokenStore>>();
         _refreshTokenStore = new InMemoryRefreshTokenStore(_mockLogger.Object);
     }
 
-    [TestMethod]
+    [Fact]
     public void Constructor_ShouldInitializeEmptyRefreshTokensDictionary()
     {
         // Act
         var store = new InMemoryRefreshTokenStore(_mockLogger.Object);
 
         // Assert
-        Assert.IsNotNull(store.RefreshTokens);
-        Assert.IsEmpty(store.RefreshTokens);
+        Assert.NotNull(store.RefreshTokens);
+        Assert.Empty(store.RefreshTokens);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task AddOrUpdate_WithNewKey_ShouldAddToken()
     {
         // Arrange
@@ -45,12 +43,12 @@ public class InMemoryRefreshTokenStoreTests
         await _refreshTokenStore.AddOrUpdate(key, token);
 
         // Assert
-        Assert.HasCount(1, _refreshTokenStore.RefreshTokens);
-        Assert.IsTrue(_refreshTokenStore.RefreshTokens.ContainsKey(key));
-        Assert.AreEqual(token, _refreshTokenStore.RefreshTokens[key]);
+        Assert.Single(_refreshTokenStore.RefreshTokens);
+        Assert.True(_refreshTokenStore.RefreshTokens.ContainsKey(key));
+        Assert.Equal(token, _refreshTokenStore.RefreshTokens[key]);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task AddOrUpdate_WithExistingKey_ShouldUpdateToken()
     {
         // Arrange
@@ -76,13 +74,13 @@ public class InMemoryRefreshTokenStoreTests
         await _refreshTokenStore.AddOrUpdate(key, updatedToken);
 
         // Assert
-        Assert.HasCount(1, _refreshTokenStore.RefreshTokens);
-        Assert.AreEqual(updatedToken, _refreshTokenStore.RefreshTokens[key]);
-        Assert.AreEqual("user456", _refreshTokenStore.RefreshTokens[key].UserIdentifier);
-        Assert.AreEqual("updated-info", _refreshTokenStore.RefreshTokens[key].AdditionalInfo);
+        Assert.Single(_refreshTokenStore.RefreshTokens);
+        Assert.Equal(updatedToken, _refreshTokenStore.RefreshTokens[key]);
+        Assert.Equal("user456", _refreshTokenStore.RefreshTokens[key].UserIdentifier);
+        Assert.Equal("updated-info", _refreshTokenStore.RefreshTokens[key].AdditionalInfo);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task Get_WithExistingToken_ShouldReturnToken()
     {
         // Arrange
@@ -101,10 +99,10 @@ public class InMemoryRefreshTokenStoreTests
         var result = await _refreshTokenStore.Get(tokenString);
 
         // Assert
-        Assert.AreEqual(token, result);
+        Assert.Equal(token, result);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task Get_WithNonExistingToken_ShouldReturnNull()
     {
         // Arrange
@@ -114,10 +112,10 @@ public class InMemoryRefreshTokenStoreTests
         var result = await _refreshTokenStore.Get(nonExistingToken);
 
         // Assert
-        Assert.IsNull(result);
+        Assert.Null(result);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task Get_WithMultipleTokens_ShouldReturnCorrectToken()
     {
         // Arrange
@@ -143,11 +141,11 @@ public class InMemoryRefreshTokenStoreTests
         var result = await _refreshTokenStore.Get("token2");
 
         // Assert
-        Assert.AreEqual(token2, result);
-        Assert.AreEqual("user2", result.UserIdentifier);
+        Assert.Equal(token2, result);
+        Assert.Equal("user2", result.UserIdentifier);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task GetTokensBefore_WithExpiredTokens_ShouldReturnExpiredTokens()
     {
         // Arrange
@@ -181,13 +179,13 @@ public class InMemoryRefreshTokenStoreTests
         var result = await _refreshTokenStore.GetTokensBefore(_utcNow);
 
         // Assert
-        Assert.HasCount(2, result);
-        Assert.IsTrue(result.Any(x => x.Key == "key1" && x.Value == expiredToken1));
-        Assert.IsTrue(result.Any(x => x.Key == "key2" && x.Value == expiredToken2));
-        Assert.IsFalse(result.Any(x => x.Key == "key3"));
+        Assert.Equal(2, result.Count);
+        Assert.Contains(result, x => x.Key == "key1" && x.Value == expiredToken1);
+        Assert.Contains(result, x => x.Key == "key2" && x.Value == expiredToken2);
+        Assert.DoesNotContain(result, x => x.Key == "key3");
     }
 
-    [TestMethod]
+    [Fact]
     public async Task GetTokensBefore_WithNoExpiredTokens_ShouldReturnEmptyList()
     {
         // Arrange
@@ -204,10 +202,10 @@ public class InMemoryRefreshTokenStoreTests
         var result = await _refreshTokenStore.GetTokensBefore(_utcNow);
 
         // Assert
-        Assert.IsEmpty(result);
+        Assert.Empty(result);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task GetTokensByIdentifier_WithMatchingTokens_ShouldReturnUserTokens()
     {
         // Arrange
@@ -242,13 +240,13 @@ public class InMemoryRefreshTokenStoreTests
         var result = await _refreshTokenStore.GetTokensByIdentifier(userIdentifier);
 
         // Assert
-        Assert.HasCount(2, result);
-        Assert.IsTrue(result.Any(x => x.Value == userToken1));
-        Assert.IsTrue(result.Any(x => x.Value == userToken2));
-        Assert.IsFalse(result.Any(x => x.Value == otherUserToken));
+        Assert.Equal(2, result.Count);
+        Assert.Contains(result, x => x.Value == userToken1);
+        Assert.Contains(result, x => x.Value == userToken2);
+        Assert.DoesNotContain(result, x => x.Value == otherUserToken);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task GetTokensByIdentifier_WithNoMatchingTokens_ShouldReturnEmptyList()
     {
         // Arrange
@@ -266,10 +264,10 @@ public class InMemoryRefreshTokenStoreTests
         var result = await _refreshTokenStore.GetTokensByIdentifier(userIdentifier);
 
         // Assert
-        Assert.IsEmpty(result);
+        Assert.Empty(result);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task RemoveNonLatestTokens_WithMultipleTokens_ShouldRemoveNonLatestTokens()
     {
         // Arrange
@@ -304,14 +302,14 @@ public class InMemoryRefreshTokenStoreTests
         await _refreshTokenStore.RemoveNonLatestTokens(userIdentifier);
 
         // Assert
-        Assert.HasCount(1, _refreshTokenStore.RefreshTokens);
-        Assert.IsTrue(_refreshTokenStore.RefreshTokens.ContainsKey("key3"));
-        Assert.AreEqual(latestToken, _refreshTokenStore.RefreshTokens["key3"]);
-        Assert.IsFalse(_refreshTokenStore.RefreshTokens.ContainsKey("key1"));
-        Assert.IsFalse(_refreshTokenStore.RefreshTokens.ContainsKey("key2"));
+        Assert.Single(_refreshTokenStore.RefreshTokens);
+        Assert.True(_refreshTokenStore.RefreshTokens.ContainsKey("key3"));
+        Assert.Equal(latestToken, _refreshTokenStore.RefreshTokens["key3"]);
+        Assert.False(_refreshTokenStore.RefreshTokens.ContainsKey("key1"));
+        Assert.False(_refreshTokenStore.RefreshTokens.ContainsKey("key2"));
     }
 
-    [TestMethod]
+    [Fact]
     public async Task RemoveNonLatestTokens_WithSingleToken_ShouldNotRemoveToken()
     {
         // Arrange
@@ -329,11 +327,11 @@ public class InMemoryRefreshTokenStoreTests
         await _refreshTokenStore.RemoveNonLatestTokens(userIdentifier);
 
         // Assert
-        Assert.HasCount(1, _refreshTokenStore.RefreshTokens);
-        Assert.IsTrue(_refreshTokenStore.RefreshTokens.ContainsKey("key1"));
+        Assert.Single(_refreshTokenStore.RefreshTokens);
+        Assert.True(_refreshTokenStore.RefreshTokens.ContainsKey("key1"));
     }
 
-    [TestMethod]
+    [Fact]
     public async Task RemoveNonLatestTokens_WithNoTokensForUser_ShouldNotThrow()
     {
         // Arrange
@@ -349,10 +347,10 @@ public class InMemoryRefreshTokenStoreTests
 
         // Act & Assert
         await _refreshTokenStore.RemoveNonLatestTokens(userIdentifier);
-        Assert.HasCount(1, _refreshTokenStore.RefreshTokens);
+        Assert.Single(_refreshTokenStore.RefreshTokens);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task Remove_WithExistingKey_ShouldRemoveToken()
     {
         // Arrange
@@ -370,11 +368,11 @@ public class InMemoryRefreshTokenStoreTests
         await _refreshTokenStore.Remove(key);
 
         // Assert
-        Assert.IsEmpty(_refreshTokenStore.RefreshTokens);
-        Assert.IsFalse(_refreshTokenStore.RefreshTokens.ContainsKey(key));
+        Assert.Empty(_refreshTokenStore.RefreshTokens);
+        Assert.False(_refreshTokenStore.RefreshTokens.ContainsKey(key));
     }
 
-    [TestMethod]
+    [Fact]
     public async Task Remove_WithNonExistingKey_ShouldNotThrow()
     {
         // Arrange
@@ -390,10 +388,10 @@ public class InMemoryRefreshTokenStoreTests
 
         // Act & Assert
         await _refreshTokenStore.Remove(nonExistingKey);
-        Assert.HasCount(1, _refreshTokenStore.RefreshTokens);
+        Assert.Single(_refreshTokenStore.RefreshTokens);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task Clear_WithMultipleTokens_ShouldRemoveAllTokens()
     {
         // Arrange
@@ -419,18 +417,18 @@ public class InMemoryRefreshTokenStoreTests
         await _refreshTokenStore.Clear();
 
         // Assert
-        Assert.IsEmpty(_refreshTokenStore.RefreshTokens);
+        Assert.Empty(_refreshTokenStore.RefreshTokens);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task Clear_WithEmptyStore_ShouldNotThrow()
     {
         // Act & Assert
         await _refreshTokenStore.Clear();
-        Assert.IsEmpty(_refreshTokenStore.RefreshTokens);
+        Assert.Empty(_refreshTokenStore.RefreshTokens);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task ConcurrentOperations_ShouldBeThreadSafe()
     {
         // Arrange
@@ -451,16 +449,16 @@ public class InMemoryRefreshTokenStoreTests
                     AdditionalInfo = $"info{index}"
                 };
                 await _refreshTokenStore.AddOrUpdate($"key{index}", token);
-            }));
+            }, TestContext.Current.CancellationToken));
         }
 
         await Task.WhenAll(tasks);
 
         // Assert
-        Assert.HasCount(tokenCount, _refreshTokenStore.RefreshTokens);
+        Assert.Equal(tokenCount, _refreshTokenStore.RefreshTokens.Count);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task AllMethods_ShouldLogAppropriateMessages()
     {
         // Arrange

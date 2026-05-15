@@ -6,17 +6,15 @@ using System.Security.Claims;
 
 namespace Edi.AspNetCore.Jwt.Tests;
 
-[TestClass]
 public class DefaultJwtAuthManagerTests
 {
-    private Mock<IRefreshTokenStore> _mockRefreshTokenStore;
-    private Mock<ILogger<DefaultJwtAuthManager>> _mockLogger;
-    private JwtTokenConfig _jwtTokenConfig;
-    private DefaultJwtAuthManager _jwtAuthManager;
+    private readonly Mock<IRefreshTokenStore> _mockRefreshTokenStore;
+    private readonly Mock<ILogger<DefaultJwtAuthManager>> _mockLogger;
+    private readonly JwtTokenConfig _jwtTokenConfig;
+    private readonly DefaultJwtAuthManager _jwtAuthManager;
     private readonly DateTime _utcNow = new(2030, 1, 1, 12, 0, 0, DateTimeKind.Utc);
 
-    [TestInitialize]
-    public void Setup()
+    public DefaultJwtAuthManagerTests()
     {
         _mockRefreshTokenStore = new Mock<IRefreshTokenStore>();
         _mockLogger = new Mock<ILogger<DefaultJwtAuthManager>>();
@@ -31,17 +29,17 @@ public class DefaultJwtAuthManagerTests
         _jwtAuthManager = new DefaultJwtAuthManager(_jwtTokenConfig, _mockRefreshTokenStore.Object, _mockLogger.Object);
     }
 
-    [TestMethod]
+    [Fact]
     public void Constructor_ShouldInitializeProperties()
     {
         // Arrange & Act
         var manager = new DefaultJwtAuthManager(_jwtTokenConfig, _mockRefreshTokenStore.Object, _mockLogger.Object);
 
         // Assert
-        Assert.AreEqual(_jwtTokenConfig, manager.JwtTokenConfig);
+        Assert.Equal(_jwtTokenConfig, manager.JwtTokenConfig);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task GetAdditionalInfo_WithValidRefreshToken_ShouldReturnAdditionalInfo()
     {
         // Arrange
@@ -61,10 +59,10 @@ public class DefaultJwtAuthManagerTests
         var result = await _jwtAuthManager.GetAdditionalInfo(refreshToken);
 
         // Assert
-        Assert.AreEqual(expectedAdditionalInfo, result);
+        Assert.Equal(expectedAdditionalInfo, result);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task GetAdditionalInfo_WithInvalidRefreshToken_ShouldReturnNull()
     {
         // Arrange
@@ -76,10 +74,10 @@ public class DefaultJwtAuthManagerTests
         var result = await _jwtAuthManager.GetAdditionalInfo(refreshToken);
 
         // Assert
-        Assert.IsNull(result);
+        Assert.Null(result);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task RemoveExpiredRefreshTokens_ShouldRemoveExpiredTokens()
     {
         // Arrange
@@ -99,7 +97,7 @@ public class DefaultJwtAuthManagerTests
         _mockRefreshTokenStore.Verify(x => x.Remove("key2"), Times.Once);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task RemoveRefreshToken_ShouldRemoveAllTokensForIdentifier()
     {
         // Arrange
@@ -120,7 +118,7 @@ public class DefaultJwtAuthManagerTests
         _mockRefreshTokenStore.Verify(x => x.Remove("key2"), Times.Once);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task RemoveNotLatestRefreshTokens_ShouldCallRefreshTokenStore()
     {
         // Arrange
@@ -133,7 +131,7 @@ public class DefaultJwtAuthManagerTests
         _mockRefreshTokenStore.Verify(x => x.RemoveNonLatestTokens(userIdentifier), Times.Once);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task GenerateTokens_WithValidParameters_ShouldReturnJwtAuthResult()
     {
         // Arrange
@@ -149,17 +147,17 @@ public class DefaultJwtAuthManagerTests
         var result = await _jwtAuthManager.GenerateTokens(userIdentifier, claims, _utcNow, additionalInfo);
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.IsNotNull(result.AccessToken);
-        Assert.IsNotNull(result.RefreshToken);
-        Assert.AreEqual(userIdentifier, result.RefreshToken.UserIdentifier);
-        Assert.AreEqual(additionalInfo, result.RefreshToken.AdditionalInfo);
-        Assert.AreEqual(_utcNow.AddMinutes(_jwtTokenConfig.RefreshTokenExpiration), result.RefreshToken.ExpireAt);
+        Assert.NotNull(result);
+        Assert.NotNull(result.AccessToken);
+        Assert.NotNull(result.RefreshToken);
+        Assert.Equal(userIdentifier, result.RefreshToken.UserIdentifier);
+        Assert.Equal(additionalInfo, result.RefreshToken.AdditionalInfo);
+        Assert.Equal(_utcNow.AddMinutes(_jwtTokenConfig.RefreshTokenExpiration), result.RefreshToken.ExpireAt);
         
         _mockRefreshTokenStore.Verify(x => x.AddOrUpdate(It.IsAny<string>(), It.IsAny<RefreshToken>()), Times.Once);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task GenerateTokens_WithAudienceClaim_ShouldNotAddAudienceToToken()
     {
         // Arrange
@@ -174,34 +172,34 @@ public class DefaultJwtAuthManagerTests
         var result = await _jwtAuthManager.GenerateTokens(userIdentifier, claims, _utcNow);
 
         // Assert
-        Assert.IsNotNull(result.AccessToken);
+        Assert.NotNull(result.AccessToken);
         var handler = new JwtSecurityTokenHandler();
         var token = handler.ReadJwtToken(result.AccessToken);
-        Assert.AreEqual("custom-audience", token.Audiences.FirstOrDefault());
+        Assert.Equal("custom-audience", token.Audiences.FirstOrDefault());
     }
 
-    [TestMethod]
+    [Fact]
     public void DecodeJwtToken_WithNullToken_ShouldThrowSecurityTokenException()
     {
         // Act & Assert
-        Assert.ThrowsExactly<SecurityTokenException>(() => _jwtAuthManager.DecodeJwtToken(null));
+        Assert.Throws<SecurityTokenException>(() => _jwtAuthManager.DecodeJwtToken(null));
     }
 
-    [TestMethod]
+    [Fact]
     public void DecodeJwtToken_WithEmptyToken_ShouldThrowSecurityTokenException()
     {
         // Act & Assert
-        Assert.ThrowsExactly<SecurityTokenException>(() => _jwtAuthManager.DecodeJwtToken(""));
+        Assert.Throws<SecurityTokenException>(() => _jwtAuthManager.DecodeJwtToken(""));
     }
 
-    [TestMethod]
+    [Fact]
     public void DecodeJwtToken_WithInvalidToken_ShouldThrowSecurityTokenMalformedException()
     {
         // Act & Assert
-        Assert.ThrowsExactly<SecurityTokenMalformedException>(() => _jwtAuthManager.DecodeJwtToken("invalid-token"));
+        Assert.Throws<SecurityTokenMalformedException>(() => _jwtAuthManager.DecodeJwtToken("invalid-token"));
     }
 
-    [TestMethod]
+    [Fact]
     public async Task Refresh_WithValidTokens_ShouldReturnRefreshTokenResult()
     {
         // Arrange
@@ -224,14 +222,14 @@ public class DefaultJwtAuthManagerTests
         var result = await _jwtAuthManager.Refresh(refreshToken.TokenString, accessToken, claimName, _utcNow);
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.IsNotNull(result.AccessToken);
-        Assert.IsNotNull(result.RefreshToken);
-        Assert.IsNotNull(result.ClaimsPrincipal);
-        Assert.AreEqual(userIdentifier, result.ClaimsPrincipal.FindFirst(claimName)?.Value);
+        Assert.NotNull(result);
+        Assert.NotNull(result.AccessToken);
+        Assert.NotNull(result.RefreshToken);
+        Assert.NotNull(result.ClaimsPrincipal);
+        Assert.Equal(userIdentifier, result.ClaimsPrincipal.FindFirst(claimName)?.Value);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task Refresh_WithExpiredAccessToken_ShouldStillWork()
     {
         // Arrange
@@ -257,13 +255,13 @@ public class DefaultJwtAuthManagerTests
         var result = await _jwtAuthManager.Refresh(refreshToken.TokenString, accessToken, claimName, _utcNow);
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.IsNotNull(result.AccessToken);
-        Assert.IsNotNull(result.RefreshToken);
-        Assert.IsNotNull(result.ClaimsPrincipal);
+        Assert.NotNull(result);
+        Assert.NotNull(result.AccessToken);
+        Assert.NotNull(result.RefreshToken);
+        Assert.NotNull(result.ClaimsPrincipal);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task Refresh_WithInvalidRefreshToken_ShouldThrowSecurityTokenException()
     {
         // Arrange
@@ -277,11 +275,11 @@ public class DefaultJwtAuthManagerTests
             .ReturnsAsync((RefreshToken)null);
 
         // Act & Assert
-        await Assert.ThrowsExactlyAsync<SecurityTokenException>(() => 
+        await Assert.ThrowsAsync<SecurityTokenException>(() => 
             _jwtAuthManager.Refresh("invalid-refresh-token", accessToken, claimName, _utcNow));
     }
 
-    [TestMethod]
+    [Fact]
     public async Task Refresh_WithExpiredRefreshToken_ShouldThrowSecurityTokenException()
     {
         // Arrange
@@ -298,11 +296,11 @@ public class DefaultJwtAuthManagerTests
             .ReturnsAsync(refreshToken);
 
         // Act & Assert
-        await Assert.ThrowsExactlyAsync<SecurityTokenException>(() => 
+        await Assert.ThrowsAsync<SecurityTokenException>(() => 
             _jwtAuthManager.Refresh(refreshToken.TokenString, accessToken, claimName, _utcNow));
     }
 
-    [TestMethod]
+    [Fact]
     public async Task Refresh_WithMismatchedUserIdentifier_ShouldThrowSecurityTokenException()
     {
         // Arrange
@@ -320,7 +318,7 @@ public class DefaultJwtAuthManagerTests
             .ReturnsAsync(refreshToken);
 
         // Act & Assert
-        await Assert.ThrowsExactlyAsync<SecurityTokenException>(() => 
+        await Assert.ThrowsAsync<SecurityTokenException>(() => 
             _jwtAuthManager.Refresh(refreshToken.TokenString, accessToken, claimName, _utcNow));
     }
 }
